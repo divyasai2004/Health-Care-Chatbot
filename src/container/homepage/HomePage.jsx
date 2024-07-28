@@ -7,6 +7,7 @@ function Homepage() {
 
   const handleSend = () => {
     if (input.trim()) {
+      //here 
       setMessages([...messages, { sender: username, text: input }]);
       setInput('');
       // Here you can also send the message to the backend or a chatbot service
