@@ -15,7 +15,7 @@ function Homepage() {
     }
   
   try {
-    const response = await axios.post('http://localhost:3100/', {
+    const response = await axios.post('http://localhost:3100/HomePage', {
      Message: messages,
      Input:input
     });
