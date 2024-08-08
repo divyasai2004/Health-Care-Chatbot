@@ -6,6 +6,7 @@ const port = 3100;
 const bodyParser= require('body-parser');
 const cors = require('cors');
 const { exec } = require('child_process');
+const axios = require('axios');
 app.use(express.json());
 app.use(cors()); 
 app.use(bodyParser.json());
@@ -39,8 +40,6 @@ app.post('/', async(req, res) => {
         console.log(password);
         try {
 
-
-
           let answer = await User.find({ un: username , ps: password })
           console.log(answer)
     
@@ -62,25 +61,20 @@ app.post('/', async(req, res) => {
     //   message: 'Data received successfully',
     //   data: receivedData
     // });
-    app.post('/HomePage', async (req, res) => {
+    app.post('/HomePage',async(req, res) => {
       const { messages, input } = req.body;
       console.log(messages);
       console.log(input);
-      exec(`python3 chatgpt.py "${messages}"`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`exec error: ${error}`);
-          return res.status(500).json({ error: 'An error occurred while processing your request.' });
-        }
-        if (stderr) {
-          console.error(`stderr: ${stderr}`);
-          return res.status(500).json({ error: 'An error occurred while processing your request.' });
-        }
-    
-        const response = JSON.parse(stdout);
-        res.json({ message: response.response });
-      });
-     
-    });
+      try{
+        
+       const response = await axios.post('http://127.0.0.1:5000/process', req.body);
+      
+       res.send(response.data);
+      } catch (error) {
+      
+      res.status(500).send(error.toString());
+    }
+   } );
 
 // Start the server
 app.listen(port, () => {
