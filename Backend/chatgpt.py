@@ -1,25 +1,30 @@
+from flask import Flask, request, jsonify
 import openai
-import sys
-import json
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+app = Flask(__name__)
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
-def get_chat_response(user_message):
-    openai.api_key = os.getenv('API_KEY')
-    
+@app.route('/process', methods=['POST'])
+def process_data():
+    data = request.json
+    print(data)
+    # Perform your processing here
+    prompt = data.get('Input')
+
+    if not prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+
     response = openai.ChatCompletion.create(
         model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": user_message},
-        ]
+        prompt=prompt,
+        max_tokens=150
     )
-    
-    return response.choices[0].message['content']
+    print(response.choices[0].text.strip())
+    return jsonify(response.choices[0].text.strip())
 
-if __name__ == "__main__":
-    user_message = sys.argv[1]
-    response = get_chat_response(user_message)
-    print(json.dumps({"response": response}))
+if __name__ == '__main__':
+    app.run(port=5000)
+
